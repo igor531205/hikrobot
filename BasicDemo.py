@@ -259,8 +259,7 @@ if __name__ == "__main__":
     def set_continue_mode():
         ret = obj_cam_operation.Set_trigger_mode(False)
         if ret != 0:
-            strError = "Set continue mode failed ret:" + \
-                ToHexStr(ret) + " mode is " + str(is_trigger_mode)
+            strError = "Set continue mode failed ret:" + ToHexStr(ret)
             QMessageBox.warning(mainWindow, "Error", strError, QMessageBox.Ok)
         else:
             ui.radioContinueMode.setChecked(True)
