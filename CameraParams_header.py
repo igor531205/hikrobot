@@ -82,7 +82,7 @@ MV_IMAGE_ROTATE_90 = 1                           # < \~chinese 旋转90度      
 MV_IMAGE_ROTATE_180 = 2                          # < \~chinese 旋转180度         \~english Rotate 180 degrees
 MV_IMAGE_ROTATE_270 = 3                          # < \~chinese 旋转270度         \~english Rotate 270 degrees
 MV_FLIP_VERTICAL = 1                             # < \~chinese 垂直翻转          \~english flip vertical
-MV_FLIP_HORIZONTAL = 2                           # < \~chinese 旋水平翻转         \~english flip horizontal
+MV_FLIP_HORIZONTAL = 2                           # < \~chinese 水平翻转         \~english flip horizontal
 MV_CC_GAMMA_TYPE_NONE = 0                        # < \~chinese 不启用                       \~english Disable
 MV_CC_GAMMA_TYPE_VALUE = 1                       # < \~chinese Gamma值                      \~english Gamma value
 MV_CC_GAMMA_TYPE_USER_CURVE = 2                  # < \~chinese Gamma曲线                    \~english Gamma curve
@@ -183,6 +183,54 @@ _MV_CamL_DEV_INFO_._fields_ = [
 ]
 MV_CamL_DEV_INFO = _MV_CamL_DEV_INFO_
 
+# 采集卡Camera Link相机信息          \~english Camera Link device information on frame grabber
+class _MV_CML_DEVICE_INFO_(Structure):
+    pass
+_MV_CML_DEVICE_INFO_._fields_ = [
+    ('chInterfaceID', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 采集卡ID   \~english Interface ID of Frame Grabber
+    ('chVendorName', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 供应商名字       \~english Vendor name
+    ('chModelName', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 型号名字         \~english Model name
+    ('chManufacturerInfo', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 厂商信息   \~english Manufacturer information
+    ('chDeviceVersion', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 相机版本          \~english Device version
+    ('chSerialNumber', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 序列号            \~english Serial Number
+    ('chUserDefinedName', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 用户自定义名字      \~english User defined name
+    ('chDeviceID', c_ubyte * INFO_MAX_BUFFER_SIZE),         # < \~chinese 相机ID            \~english Device ID
+    ('nReserved', c_uint * 7),                              # < \~chinese 保留字节           \~english Reserved bytes
+]
+MV_CML_DEVICE_INFO = _MV_CML_DEVICE_INFO_
+
+# CoaXPress相机信息      \~english CoaXPress device information
+class _MV_CXP_DEVICE_INFO_(Structure):
+    pass
+_MV_CXP_DEVICE_INFO_._fields_ = [
+    ('chInterfaceID', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 采集卡ID   \~english Interface ID of Frame Grabber
+    ('chVendorName', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 供应商名字       \~english Vendor name
+    ('chModelName', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 型号名字         \~english Model name
+    ('chManufacturerInfo', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 厂商信息   \~english Manufacturer information
+    ('chDeviceVersion', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 相机版本          \~english Device version
+    ('chSerialNumber', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 序列号            \~english Serial Number
+    ('chUserDefinedName', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 用户自定义名字      \~english User defined name
+    ('chDeviceID', c_ubyte * INFO_MAX_BUFFER_SIZE),         # < \~chinese 相机ID            \~english Device ID
+    ('nReserved', c_uint * 7),                              # < \~chinese 保留字节           \~english Reserved bytes
+]
+MV_CXP_DEVICE_INFO = _MV_CXP_DEVICE_INFO_
+
+# XoFLink相机信息      \~english XoFLink device information
+class _MV_XOF_DEVICE_INFO_(Structure):
+    pass
+_MV_XOF_DEVICE_INFO_._fields_ = [
+    ('chInterfaceID', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 采集卡ID   \~english Interface ID of Frame Grabber
+    ('chVendorName', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 供应商名字       \~english Vendor name
+    ('chModelName', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 型号名字         \~english Model name
+    ('chManufacturerInfo', c_ubyte * INFO_MAX_BUFFER_SIZE),   # < \~chinese 厂商信息   \~english Manufacturer information
+    ('chDeviceVersion', c_ubyte * INFO_MAX_BUFFER_SIZE),    # < \~chinese 相机版本          \~english Device version
+    ('chSerialNumber', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 序列号            \~english Serial Number
+    ('chUserDefinedName', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 用户自定义名字      \~english User defined name
+    ('chDeviceID', c_ubyte * INFO_MAX_BUFFER_SIZE),         # < \~chinese 相机ID            \~english Device ID
+    ('nReserved', c_uint * 7),                              # < \~chinese 保留字节           \~english Reserved bytes
+]
+MV_XOF_DEVICE_INFO = _MV_XOF_DEVICE_INFO_
+
 # CameraParams.h 80
 class _MV_CC_DEVICE_INFO_(Structure):
     pass
@@ -193,16 +241,19 @@ N19_MV_CC_DEVICE_INFO_3DOT_0E._fields_ = [
     ('stGigEInfo', MV_GIGE_DEVICE_INFO),                   # < \~chinese Gige设备信息        \~english Gige device infomation
     ('stUsb3VInfo', MV_USB3_DEVICE_INFO),                  # < \~chinese U3V设备信息         \~english u3V device information
     ('stCamLInfo', MV_CamL_DEV_INFO),                      # < \~chinese CamLink设备信息     \~english CamLink device information
+    ('stCMLInfo', MV_CML_DEVICE_INFO),  # < \~chinese 采集卡CameraLink设备信息     \~english CameraLink Device Info On Frame Grabber
+    ('stCXPInfo', MV_CXP_DEVICE_INFO),  # < \~chinese 采集卡CoaXPress设备信息     \~english CoaXPress Device Info On Frame Grabber
+    ('stXoFInfo', MV_XOF_DEVICE_INFO),  # < \~chinese 采集卡XoF设备信息          \~english XoF Device Info On Frame Grabber
 ]
 
 _MV_CC_DEVICE_INFO_._fields_ = [
-    # CameraParams.h 80
     ('nMajorVer', c_ushort),                              # < \~chinese 规范的主要版本         \~english Major version of the specification.
     ('nMinorVer', c_ushort),                              # < \~chinese 规范的次要版本         \~english Minor version of the specification
     ('nMacAddrHigh', c_uint),                             # < \~chinese MAC地址高位           \~english Mac address high
     ('nMacAddrLow', c_uint),                              # < \~chinese MAC地址低位           \~english Mac address low
     ('nTLayerType', c_uint),                              # < \~chinese 设备传输层协议类型     \~english Device Transport Layer Protocol Type, e.g. MV_GIGE_DEVICE
-    ('nReserved', c_uint * 4),                            # < \~chinese 保留字节              \~english Reserved bytes
+    ('nDevTypeInfo', c_uint),                             # < \~chinese 设备类型信息         \~english Device Type Info
+    ('nReserved', c_uint * 3),                            # < \~chinese 保留字节              \~english Reserved bytes
     ('SpecialInfo', N19_MV_CC_DEVICE_INFO_3DOT_0E),       # < \~chinese 不同设备特有信息       \~english Special information
 ]
 MV_CC_DEVICE_INFO = _MV_CC_DEVICE_INFO_
@@ -301,26 +352,26 @@ _MV_FRAME_OUT_INFO_EX_._fields_ = [
     ('nFrameLen', c_uint),                                   # < \~chinese 帧的长度           \~english Frame length
     # < \~chinese 以下为chunk新增水印信息 \~english The followings are chunk add frame-specific information
     # < \~chinese 设备水印时标 \~english Device frame-specific time scale
-    ('nSecondCount', c_uint),                                
-    ('nCycleCount', c_uint),                                 
-    ('nCycleOffset', c_uint),                                
+    ('nSecondCount', c_uint),                                # < \~chinese 秒数               \~english The Seconds                         
+    ('nCycleCount', c_uint),                                 # < \~chinese 周期数             \~english The Count of Cycle                
+    ('nCycleOffset', c_uint),                                # < \~chinese 周期偏移量         \~english The Offset of Cycle                  
     ('fGain', c_float),                                      # < \~chinese 增益               \~english Gain
     ('fExposureTime', c_float),                              # < \~chinese 曝光时间           \~english Exposure Time
     ('nAverageBrightness', c_uint),                          # < \~chinese 平均亮度           \~english Average brightness
     # < \~chinese:白平衡相关 \~english White balance
-    ('nRed', c_uint),                                         
-    ('nGreen', c_uint),                                      
-    ('nBlue', c_uint),                                       
+    ('nRed', c_uint),                                        # < \~chinese 红色               \~english Red     
+    ('nGreen', c_uint),                                      # < \~chinese 绿色               \~english Green
+    ('nBlue', c_uint),                                       # < \~chinese 蓝色               \~english Blue
     ('nFrameCounter', c_uint),                               # < \~chinese 帧计数             \~english Frame counter
     ('nTriggerIndex', c_uint),                               # < \~chinese 触发计数           \~english Trigger index
     # < \~chinese  输入/输出 \~english Line Input/Output
-    ('nInput', c_uint),                                     
-    ('nOutput', c_uint),             
+    ('nInput', c_uint),                                      # < \~chinese 输入               \~english input
+    ('nOutput', c_uint),                                     # < \~chinese 输出               \~english output
     # < \~chinese ROI区域 \~english ROI Region                       
-    ('nOffsetX', c_ushort),                                  
-    ('nOffsetY', c_ushort),                                  
-    ('nChunkWidth', c_ushort),                              
-    ('nChunkHeight', c_ushort),                             
+    ('nOffsetX', c_ushort),                                  # < \~chinese 水平偏移量             \~english OffsetX   
+    ('nOffsetY', c_ushort),                                  # < \~chinese 垂直偏移量             \~english OffsetY
+    ('nChunkWidth', c_ushort),                               # < \~chinese chunk 宽              \~english The Width of Chunk
+    ('nChunkHeight', c_ushort),                              # < \~chinese chunk 高               \~english The Height of Chunk
     ('nLostPacket', c_uint),                                 # < \~chinese 本帧丢包数            \~english Lost Pacekt Number In This Frame
     ('nUnparsedChunkNum', c_uint),                           # < \~chinese 未解析的Chunkdata个数 \~english Unparsed chunk number
     ('UnparsedChunkList', N22_MV_FRAME_OUT_INFO_EX_3DOT_1E), # < \~chinese 数据库链表            \~english Unparsed chunk list
@@ -339,7 +390,8 @@ _MV_DISPLAY_FRAME_INFO_EX_._fields_ = [
     ('enPixelType', MvGvspPixelType),  # < \~chinese 像素格式            \~english Pixel Type
     ('pImageBuf', POINTER(c_ubyte)),   # < \~chinese 输入图像缓存         \~english Input image buffer
     ('nImageBufLen', c_uint),          # < \~chinese 输入图像长度         \~english Input image length
-    ('nRes', c_uint * 4),              # < \~chinese 保留字节            \~english Reserved bytes
+    ('enRenderMode', c_uint),          # < \~chinese 图像渲染方式 0-默认模式(Windows GDI/Linux OPENGL), 1-D3D模式(Windows有效)   \~english Render mode 0-Default Mode 1-D3D Mode
+    ('nRes', c_uint * 3),              # < \~chinese 保留字节            \~english Reserved bytes
 ]
 MV_DISPLAY_FRAME_INFO_EX = _MV_DISPLAY_FRAME_INFO_EX_
 
@@ -413,7 +465,8 @@ _MV_DISPLAY_FRAME_INFO_._fields_ = [
     ('nWidth', c_ushort),             # < \~chinese 图像宽             \~english Width
     ('nHeight', c_ushort),            # < \~chinese 图像高             \~english Height
     ('enPixelType', MvGvspPixelType), # < \~chinese 像素格式           \~english Pixel format
-    ('nRes', c_uint * 4),             # < \~chinese 保留字节           \~english Reserved bytes
+    ('enRenderMode', c_uint),         # < \~chinese 图像渲染方式 0-默认模式(Windows GDI/Linux OPENGL), 1-D3D模式(Windows有效)   \~english Render mode 0-Default Mode 1-D3D Mode
+    ('nRes', c_uint * 3),             # < \~chinese 保留字节           \~english Reserved bytes
 ]
 MV_DISPLAY_FRAME_INFO = _MV_DISPLAY_FRAME_INFO_
 
@@ -454,8 +507,8 @@ _MV_SAVE_IMAGE_PARAM_T_EX_._fields_ = [
     ('nBufferSize', c_uint),                                # < \~chinese 提供的输出缓冲区大小         \~english Output buffer size provided
     ('enImageType', MV_SAVE_IAMGE_TYPE),                    # < \~chinese 输出图片格式         \~english Output Image Format
     ('nJpgQuality', c_uint),                                # < \~chinese 编码质量, (50-99]         \~english Encoding quality, (50-99]
-    # < \~chinese Bayer格式转为RGB24的插值方法  0-最近邻 1-双线性 2-Hamilton （如果传入其它值则默认为最近邻）
-	# < \~english Interpolation method of convert Bayer to RGB24  0-nearest neighbour 1-bilinearity 2-Hamilton
+    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-快速 1-均衡 2-最优 3-最优+
+    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-Fast 1-Equilibrium 2-Optimal 3-Optimal plus
     ('iMethodValue', c_uint),
     ('nReserved', c_uint * 3),                              # < \~chinese 保留字节           \~english Reserved bytes
 ]
@@ -474,8 +527,8 @@ _MV_SAVE_IMAGE_PARAM_EX3_._fields_ = [
     ('nBufferSize', c_uint),                                # < \~chinese 提供的输出缓冲区大小         \~english Output buffer size provided
     ('enImageType', MV_SAVE_IAMGE_TYPE),                    # < \~chinese 输出图片格式         \~english Output Image Format
     ('nJpgQuality', c_uint),                                # < \~chinese 编码质量, (50-99]         \~english Encoding quality, (50-99]
-    # < \~chinese Bayer格式转为RGB24的插值方法  0-最近邻 1-双线性 2-Hamilton （如果传入其它值则默认为最近邻）
-	# < \~english Interpolation method of convert Bayer to RGB24  0-nearest neighbour 1-bilinearity 2-Hamilton
+    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-快速 1-均衡 2-最优 3-最优+
+    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-Fast 1-Equilibrium 2-Optimal 3-Optimal plus
     ('iMethodValue', c_uint),
     ('nReserved', c_uint * 3),                              # < \~chinese 保留字节           \~english Reserved bytes
 ]
@@ -491,10 +544,10 @@ _MV_SAVE_IMG_TO_FILE_PARAM_._fields_ = [
     ('nWidth', c_ushort),                # < \~chinese 图像宽                                  \~english Image Width
     ('nHeight', c_ushort),               # < \~chinese 图像高                                   \~english Image Height
     ('enImageType', MV_SAVE_IAMGE_TYPE), # < \~chinese 输入图片格式                               \~english Input Image Format
-    ('nQuality', c_uint),                # < \~chinese JPG编码质量(50-99],PNG编码质量[0-9]         \~english JPG Encoding quality(50-99],PNG Encoding quality[0-9]
+    ('nQuality', c_uint),                # < \~chinese JPG编码质量(50-99]         \~english JPG Encoding quality(50-99]
     ('pImagePath', c_char * 256),        # < \~chinese 输入文件路径         \~english Input file path
-    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-最近邻 1-双线性 2-Hamilton
-    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-nearest neighbour 1-bilinearity 2-Hamilton
+    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-快速 1-均衡 2-最优 3-最优+
+    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-Fast 1-Equilibrium 2-Optimal 3-Optimal plus
     ('iMethodValue', c_int),             
     ('nReserved', c_uint * 8),           # < \~chinese 保留字节           \~english Reserved bytes
 ]
@@ -505,18 +558,16 @@ class _MV_SAVE_IMAGE_TO_FILE_PARAM_EX_(Structure):
 _MV_SAVE_IMAGE_TO_FILE_PARAM_EX_._fields_ = [
     ('nWidth', c_uint),  # < \~chinese 图像宽                                  \~english Image Width
     ('nHeight', c_uint),  # < \~chinese 图像高                                 \~english Image Height
-    ('enPixelType', MvGvspPixelType),
     # < \~chinese 输入数据的像素格式                    \~english The pixel format of the input data
+    ('enPixelType', MvGvspPixelType),
     ('pData', POINTER(c_ubyte)),  # < \~chinese 输入数据缓存                          \~english Input Data Buffer
     ('nDataLen', c_uint),  # < \~chinese 输入数据大小                           \~english Input Data Size
-
-    ('enImageType', MV_SAVE_IAMGE_TYPE),
     # < \~chinese 输入图片格式                               \~english Input Image Format
+    ('enImageType', MV_SAVE_IAMGE_TYPE),
     ('pcImagePath', POINTER(c_char)),  # < \~chinese 输入文件路径         \~english Input file path
-    ('nQuality', c_uint),
-    # < \~chinese JPG编码质量(50-99],PNG编码质量[0-9]         \~english JPG Encoding quality(50-99],PNG Encoding quality[0-9]
-    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-最近邻 1-双线性 2-Hamilton
-    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-nearest neighbour 1-bilinearity 2-Hamilton
+    ('nQuality', c_uint),      # < \~chinese JPG编码质量(50-99]，其他格式无效    \~english JPG Encoding quality(50-99]
+    # < \~chinese     ch:Bayer格式转为RGB24的插值方法 0-快速 1-均衡 2-最优 3-最优+
+    # < \~english   en:Interpolation method of convert Bayer to RGB24  0-Fast 1-Equilibrium 2-Optimal 3-Optimal plus
     ('iMethodValue', c_int),
     ('nReserved', c_uint * 8),  # < \~chinese 保留字节           \~english Reserved bytes
 ]
@@ -623,12 +674,12 @@ _MV_EVENT_OUT_INFO_._fields_ = [
     ('EventName', c_char * MAX_EVENT_NAME_SIZE), # < \~chinese Event名称       \~english Event name
     ('nEventID', c_ushort),                      # < \~chinese Event号          \~english Event ID
     ('nStreamChannel', c_ushort),                # < \~chinese 流通道序号         \~english Circulation number
-    ('nBlockIdHigh', c_uint),                    # < \~chinese 帧号高位            \~english BlockId high
-    ('nBlockIdLow', c_uint),                     # < \~chinese 帧号低位             \~english BlockId low
+    ('nBlockIdHigh', c_uint),                    # < \~chinese 帧号高位  (暂无固件支持)          \~english BlockId high, not support
+    ('nBlockIdLow', c_uint),                     # < \~chinese 帧号低位  (暂无固件支持)           \~english BlockId low, not support
     ('nTimestampHigh', c_uint),                  # < \~chinese 时间戳高位            \~english Timestramp high
     ('nTimestampLow', c_uint),                   # < \~chinese 时间戳低位             \~english Timestramp low
-    ('pEventData', c_void_p),                    # < \~chinese Event数据              \~english Event data
-    ('nEventDataSize', c_uint),                  # < \~chinese Event数据长度           \~english Event data len
+    ('pEventData', c_void_p),                    # < \~chinese Event数据     (暂无固件支持)         \~english Event data, not support
+    ('nEventDataSize', c_uint),                  # < \~chinese Event数据长度 (暂无固件支持)         \~english Event data len, not support
     ('nReserved', c_uint * 16),                  # < \~chinese 保留字节                 \~english Reserved bytes
 ]
 MV_EVENT_OUT_INFO = _MV_EVENT_OUT_INFO_
@@ -889,7 +940,7 @@ class _MV_CC_CCM_PARAM_T_(Structure):
     pass
 _MV_CC_CCM_PARAM_T_._fields_ = [
     ('bCCMEnable', c_bool),         # < \~chinese 是否启用CCM            \~english CCM enable
-    ('nCCMat', c_int * 9),          # < \~chinese CCM矩阵(-8192~8192)    \~english Color correction matrix(-8192~8192)
+    ('nCCMat', c_int * 9),          # < \~chinese CCM矩阵[-8192~8192]   \~english Color correction matrix[-8192~8192]
     ('nRes', c_uint * 8),           # < \~chinese 保留字节             \~english Reserved bytes
 ]
 MV_CC_CCM_PARAM = _MV_CC_CCM_PARAM_T_
@@ -899,9 +950,8 @@ class _MV_CC_CCM_PARAM_EX_T_(Structure):
     pass
 _MV_CC_CCM_PARAM_EX_T_._fields_ = [
     ('bCCMEnable', c_bool),         # < \~chinese 是否启用CCM            \~english CCM enable
-    ('nCCMat', c_int * 9),          # < \~chinese CCM矩阵(-65536~65536)  \~english Color correction matrix(-65536~65536)
-    ('nCCMScale', c_uint),
-    # < \~chinese 量化系数（2的整数幂,最大65536）    \~english Quantitative scale(Integer power of 2, <= 65536)
+    ('nCCMat', c_int * 9),          # < \~chinese CCM矩阵[-65536~65536]  \~english Color correction matrix[-65536~65536]
+    ('nCCMScale', c_uint),          # < \~chinese 量化系数（2的整数幂,最大65536）    \~english Quantitative scale(Integer power of 2, <= 65536)
     ('nRes', c_uint * 8),           # < \~chinese 保留字节             \~english Reserved bytes
 ]
 MV_CC_CCM_PARAM_EX = _MV_CC_CCM_PARAM_EX_T_
@@ -1049,6 +1099,51 @@ _MV_CC_FILE_ACCESS_E._fields_ = [
 ]
 MV_CC_FILE_ACCESS_EX = _MV_CC_FILE_ACCESS_E
 
+# 采集卡信息            \~english Interface information
+class _MV_INTERFACE_INFO_(Structure):
+    pass
+_MV_INTERFACE_INFO_._fields_ = [
+    ('nTLayerType', c_uint),               # < \~chinese 采集卡类型    \~english Interface type
+    ('nPCIEInfo', c_uint),                 # < \~chinese 采集卡的PCIE插槽信息  \~english PCIe slot information of interface
+    ('chInterfaceID', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 采集卡ID    \~english Interface ID
+    ('chDisplayName', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 显示名称    \~english Display name
+    ('chSerialNumber', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 序列号      \~english Serial number
+    ('chModelName', c_ubyte * INFO_MAX_BUFFER_SIZE),     # < \~chinese 型号        \~english model name
+    ('chManufacturer', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 厂商        \~english manufacturer name
+    ('chDeviceVersion', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 版本号      \~english device version
+    ('chUserDefinedName', c_ubyte * INFO_MAX_BUFFER_SIZE),  # < \~chinese 自定义名称 \~english user defined name
+    ('nReserved', c_uint * 64),                             # < \~chinese 保留字节   \~english Reserved bytes
+]
+MV_INTERFACE_INFO = _MV_INTERFACE_INFO_
+
+# 采集卡信息列表           \~english Interface Information List
+class _MV_INTERFACE_INFO_LIST_(Structure):
+    pass
+_MV_INTERFACE_INFO_LIST_._fields_ = [
+    ('nInterfaceNum', c_uint),                                          # < \~chinese 在线设备数量         \~english Online Device Number
+    ('pInterfaceInfos', POINTER(MV_INTERFACE_INFO) * MV_MAX_INTERFACE_NUM), # < \~chinese 支持最多256个设备    \~english Support up to 256 devices
+]
+MV_INTERFACE_INFO_LIST = _MV_INTERFACE_INFO_LIST_
+
+# 串口信息      \~english Serial Port Info
+class _MV_CAML_SERIAL_PORT_(Structure):
+    pass
+_MV_CAML_SERIAL_PORT_._fields_ = [
+    ('chSerialPort', c_char * INFO_MAX_BUFFER_SIZE),   # < \~chinese 串口号          \~english Serial Port
+    ('nRes', c_uint * 4),                              # < \~chinese 保留字节        \~english Reserved bytes
+]
+MV_CAML_SERIAL_PORT = _MV_CAML_SERIAL_PORT_
+
+# 本机串口列表            \~english serial port list
+class _MV_CAML_SERIAL_PORT_LIST_(Structure):
+    pass
+_MV_CAML_SERIAL_PORT_LIST_._fields_ = [
+    ('nSerialPortNum', c_uint),                                      # < \~chinese 串口数量   \~english Serial Port Num
+    ('stSerialPort', MV_CAML_SERIAL_PORT * MV_MAX_SERIAL_PORT_NUM),  # < \~chinese 串口信息   \~english Serial Port Information
+    ('nRes', c_uint * 4),  # < \~chinese 保留字节   \~english Reserved bytes
+]
+MV_CAML_SERIAL_PORT_LIST = _MV_CAML_SERIAL_PORT_LIST_
+
 __all__ = ['_MV_ALL_MATCH_INFO_', 'MV_CC_FILE_ACCESS_PROGRESS',
            'N19_MV_CC_DEVICE_INFO_3DOT_0E', 'MV_FRAME_OUT',
            'MV_CAM_GAIN_MODE',
@@ -1187,4 +1282,7 @@ __all__ = ['_MV_ALL_MATCH_INFO_', 'MV_CC_FILE_ACCESS_PROGRESS',
            '_MV_CC_CCM_PARAM_EX_T_', 'MV_CC_CCM_PARAM_EX', 'MV_CC_CCM_PARAM', '_MV_CC_CCM_PARAM_T_',
            'MV_CC_GAMMA_PARAM', '_MV_CC_GAMMA_PARAM_T_', 'MV_CC_FLIP_IMAGE_PARAM', '_MV_CC_FLIP_IMAGE_PARAM_T_',
            '_MV_CC_ROTATE_IMAGE_PARAM_T_', 'MV_CC_ROTATE_IMAGE_PARAM', 'MV_CC_FILE_ACCESS_EX', '_MV_CC_FILE_ACCESS_E',
-           '_MV_DISPLAY_FRAME_INFO_EX_', 'MV_DISPLAY_FRAME_INFO_EX']
+           '_MV_DISPLAY_FRAME_INFO_EX_', 'MV_DISPLAY_FRAME_INFO_EX', 'MV_CML_DEVICE_INFO', '_MV_CML_DEVICE_INFO_',
+           'MV_CXP_DEVICE_INFO', '_MV_CXP_DEVICE_INFO_', '_MV_XOF_DEVICE_INFO_', 'MV_XOF_DEVICE_INFO',
+           '_MV_INTERFACE_INFO_LIST_', 'MV_INTERFACE_INFO_LIST', '_MV_INTERFACE_INFO_', 'MV_INTERFACE_INFO',
+           '_MV_CAML_SERIAL_PORT_LIST_', 'MV_CAML_SERIAL_PORT_LIST', '_MV_CAML_SERIAL_PORT_', 'MV_CAML_SERIAL_PORT']

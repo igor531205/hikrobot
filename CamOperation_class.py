@@ -4,24 +4,28 @@ import threading
 import msvcrt
 import numpy as np
 import time
-import sys, os
-import datetime
+import sys
+import os
 import inspect
 import ctypes
 import random
 from ctypes import *
+from datetime import datetime
 
-sys.path.append("../MvImport")
+# sys.path.append("../MvImport")
 
 from CameraParams_header import *
 from MvCameraControl_class import *
 
 # 强制关闭线程
+
+
 def Async_raise(tid, exctype):
     tid = ctypes.c_long(tid)
     if not inspect.isclass(exctype):
         exctype = type(exctype)
-    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+        tid, ctypes.py_object(exctype))
     if res == 0:
         raise ValueError("invalid thread id")
     elif res != 1:
@@ -78,7 +82,8 @@ def Is_color_data(enGvspPixelType):
 
 # Mono图像转为python数组
 def Mono_numpy(data, nWidth, nHeight):
-    data_ = np.frombuffer(data, count=int(nWidth * nHeight), dtype=np.uint8, offset=0)
+    data_ = np.frombuffer(data, count=int(
+        nWidth * nHeight), dtype=np.uint8, offset=0)
     data_mono_arr = data_.reshape(nHeight, nWidth)
     numArray = np.zeros([nHeight, nWidth, 1], "uint8")
     numArray[:, :, 0] = data_mono_arr
@@ -87,7 +92,8 @@ def Mono_numpy(data, nWidth, nHeight):
 
 # 彩色图像转为python数组
 def Color_numpy(data, nWidth, nHeight):
-    data_ = np.frombuffer(data, count=int(nWidth * nHeight * 3), dtype=np.uint8, offset=0)
+    data_ = np.frombuffer(data, count=int(
+        nWidth * nHeight * 3), dtype=np.uint8, offset=0)
     data_r = data_[0:nWidth * nHeight * 3:3]
     data_g = data_[1:nWidth * nHeight * 3:3]
     data_b = data_[2:nWidth * nHeight * 3:3]
@@ -155,22 +161,27 @@ class CameraOperation:
             self.b_thread_closed = False
 
             # ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
-            if stDeviceList.nTLayerType == MV_GIGE_DEVICE:
+            if stDeviceList.nTLayerType == MV_GIGE_DEVICE or stDeviceList.nTLayerType == MV_GENTL_GIGE_DEVICE:
                 nPacketSize = self.obj_cam.MV_CC_GetOptimalPacketSize()
                 if int(nPacketSize) > 0:
-                    ret = self.obj_cam.MV_CC_SetIntValue("GevSCPSPacketSize", nPacketSize)
+                    ret = self.obj_cam.MV_CC_SetIntValue(
+                        "GevSCPSPacketSize", nPacketSize)
                     if ret != 0:
                         print("warning: set packet size fail! ret[0x%x]" % ret)
                 else:
-                    print("warning: set packet size fail! ret[0x%x]" % nPacketSize)
+                    print(
+                        "warning: set packet size fail! ret[0x%x]" % nPacketSize)
 
             stBool = c_bool(False)
-            ret = self.obj_cam.MV_CC_GetBoolValue("AcquisitionFrameRateEnable", stBool)
+            ret = self.obj_cam.MV_CC_GetBoolValue(
+                "AcquisitionFrameRateEnable", stBool)
             if ret != 0:
-                print("get acquisition frame rate enable fail! ret[0x%x]" % ret)
+                print(
+                    "get acquisition frame rate enable fail! ret[0x%x]" % ret)
 
             # ch:设置触发模式为off | en:Set trigger mode as off
-            ret = self.obj_cam.MV_CC_SetEnumValue("TriggerMode", MV_TRIGGER_MODE_OFF)
+            ret = self.obj_cam.MV_CC_SetEnumValue(
+                "TriggerMode", MV_TRIGGER_MODE_OFF)
             if ret != 0:
                 print("set trigger mode fail! ret[0x%x]" % ret)
             return MV_OK
@@ -186,7 +197,8 @@ class CameraOperation:
             print("start grabbing successfully!")
             try:
                 thread_id = random.randint(1, 10000)
-                self.h_thread_handle = threading.Thread(target=CameraOperation.Work_thread, args=(self, winHandle))
+                self.h_thread_handle = threading.Thread(
+                    target=CameraOperation.Work_thread, args=(self, winHandle))
                 self.h_thread_handle.start()
                 self.b_thread_closed = True
             finally:
@@ -245,7 +257,9 @@ class CameraOperation:
             ret = self.obj_cam.MV_CC_SetEnumValue("TriggerMode", 1)
             if ret != 0:
                 return ret
-            ret = self.obj_cam.MV_CC_SetEnumValue("TriggerSource", 7)
+            ret = self.obj_cam.MV_CC_SetEnumValue(
+                # MV_TRIGGER_SOURCE_SOFTWARE MV_TRIGGER_SOURCE_LINE0
+                "TriggerSource", MV_TRIGGER_SOURCE_LINE0)
             if ret != 0:
                 return ret
 
@@ -253,24 +267,45 @@ class CameraOperation:
 
     # 软触发一次
     def Trigger_once(self):
+
         if self.b_open_device:
-            return self.obj_cam.MV_CC_SetCommandValue("TriggerSoftware")
+
+            ret = self.obj_cam.MV_CC_SetEnumValueByString(
+                "LineSelector", "Line1")
+            if ret != 0:
+                return ret
+            ret = self.obj_cam.MV_CC_SetBoolValue(
+                "StrobeEnable", True)
+            if ret != 0:
+                return ret
+            ret = self.obj_cam.MV_CC_SetCommandValue("LineTriggerSoftware")
+            if ret != 0:
+                return ret
+            ret = self.obj_cam.MV_CC_SetBoolValue("StrobeEnable", False)
+            if ret != 0:
+                return ret
+
+            return MV_OK
 
     # 获取参数
+
     def Get_parameter(self):
         if self.b_open_device:
             stFloatParam_FrameRate = MVCC_FLOATVALUE()
             memset(byref(stFloatParam_FrameRate), 0, sizeof(MVCC_FLOATVALUE))
             stFloatParam_exposureTime = MVCC_FLOATVALUE()
-            memset(byref(stFloatParam_exposureTime), 0, sizeof(MVCC_FLOATVALUE))
+            memset(byref(stFloatParam_exposureTime),
+                   0, sizeof(MVCC_FLOATVALUE))
             stFloatParam_gain = MVCC_FLOATVALUE()
             memset(byref(stFloatParam_gain), 0, sizeof(MVCC_FLOATVALUE))
-            ret = self.obj_cam.MV_CC_GetFloatValue("AcquisitionFrameRate", stFloatParam_FrameRate)
+            ret = self.obj_cam.MV_CC_GetFloatValue(
+                "AcquisitionFrameRate", stFloatParam_FrameRate)
             if ret != 0:
                 return ret
             self.frame_rate = stFloatParam_FrameRate.fCurValue
 
-            ret = self.obj_cam.MV_CC_GetFloatValue("ExposureTime", stFloatParam_exposureTime)
+            ret = self.obj_cam.MV_CC_GetFloatValue(
+                "ExposureTime", stFloatParam_exposureTime)
             if ret != 0:
                 return ret
             self.exposure_time = stFloatParam_exposureTime.fCurValue
@@ -290,7 +325,8 @@ class CameraOperation:
         if self.b_open_device:
             ret = self.obj_cam.MV_CC_SetEnumValue("ExposureAuto", 0)
             time.sleep(0.2)
-            ret = self.obj_cam.MV_CC_SetFloatValue("ExposureTime", float(exposureTime))
+            ret = self.obj_cam.MV_CC_SetFloatValue(
+                "ExposureTime", float(exposureTime))
             if ret != 0:
                 print('show error', 'set exposure time fail! ret = ' + To_hex_str(ret))
                 return ret
@@ -300,9 +336,11 @@ class CameraOperation:
                 print('show error', 'set gain fail! ret = ' + To_hex_str(ret))
                 return ret
 
-            ret = self.obj_cam.MV_CC_SetFloatValue("AcquisitionFrameRate", float(frameRate))
+            ret = self.obj_cam.MV_CC_SetFloatValue(
+                "AcquisitionFrameRate", float(frameRate))
             if ret != 0:
-                print('show error', 'set acquistion frame rate fail! ret = ' + To_hex_str(ret))
+                print(
+                    'show error', 'set acquistion frame rate fail! ret = ' + To_hex_str(ret))
                 return ret
 
             print('show info', 'set parameter success!')
@@ -319,18 +357,23 @@ class CameraOperation:
             if 0 == ret:
                 # 拷贝图像和图像信息
                 if self.buf_save_image is None:
-                    self.buf_save_image = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
+                    self.buf_save_image = (
+                        c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
                 self.st_frame_info = stOutFrame.stFrameInfo
 
                 # 获取缓存锁
                 self.buf_lock.acquire()
-                cdll.msvcrt.memcpy(byref(self.buf_save_image), stOutFrame.pBufAddr, self.st_frame_info.nFrameLen)
+                cdll.msvcrt.memcpy(
+                    byref(self.buf_save_image), stOutFrame.pBufAddr, self.st_frame_info.nFrameLen)
                 self.buf_lock.release()
 
                 print("get one frame: Width[%d], Height[%d], nFrameNum[%d]"
                       % (self.st_frame_info.nWidth, self.st_frame_info.nHeight, self.st_frame_info.nFrameNum))
                 # 释放缓存
                 self.obj_cam.MV_CC_FreeImageBuffer(stOutFrame)
+
+                self.Save_jpg()
+
             else:
                 print("no data, ret = " + To_hex_str(ret))
                 continue
@@ -364,15 +407,17 @@ class CameraOperation:
         file_path = str(self.st_frame_info.nFrameNum) + ".jpg"
         c_file_path = file_path.encode('ascii')
         stSaveParam = MV_SAVE_IMAGE_TO_FILE_PARAM_EX()
-        stSaveParam.enPixelType = self.st_frame_info.enPixelType  # ch:相机对应的像素格式 | en:Camera pixel type
+        # ch:相机对应的像素格式 | en:Camera pixel type
+        stSaveParam.enPixelType = self.st_frame_info.enPixelType
         stSaveParam.nWidth = self.st_frame_info.nWidth  # ch:相机对应的宽 | en:Width
         stSaveParam.nHeight = self.st_frame_info.nHeight  # ch:相机对应的高 | en:Height
         stSaveParam.nDataLen = self.st_frame_info.nFrameLen
         stSaveParam.pData = cast(self.buf_save_image, POINTER(c_ubyte))
-        stSaveParam.enImageType = MV_Image_Jpeg  # ch:需要保存的图像类型 | en:Image format to save
+        # ch:需要保存的图像类型 | en:Image format to save
+        stSaveParam.enImageType = MV_Image_Jpeg
         stSaveParam.nQuality = 80
         stSaveParam.pcImagePath = ctypes.create_string_buffer(c_file_path)
-        stSaveParam.iMethodValue = 2
+        stSaveParam.iMethodValue = 1
         ret = self.obj_cam.MV_CC_SaveImageToFileEx(stSaveParam)
 
         self.buf_lock.release()
@@ -391,18 +436,18 @@ class CameraOperation:
         c_file_path = file_path.encode('ascii')
 
         stSaveParam = MV_SAVE_IMAGE_TO_FILE_PARAM_EX()
-        stSaveParam.enPixelType = self.st_frame_info.enPixelType  # ch:相机对应的像素格式 | en:Camera pixel type
+        # ch:相机对应的像素格式 | en:Camera pixel type
+        stSaveParam.enPixelType = self.st_frame_info.enPixelType
         stSaveParam.nWidth = self.st_frame_info.nWidth  # ch:相机对应的宽 | en:Width
         stSaveParam.nHeight = self.st_frame_info.nHeight  # ch:相机对应的高 | en:Height
         stSaveParam.nDataLen = self.st_frame_info.nFrameLen
         stSaveParam.pData = cast(self.buf_save_image, POINTER(c_ubyte))
-        stSaveParam.enImageType = MV_Image_Bmp  # ch:需要保存的图像类型 | en:Image format to save
-        stSaveParam.nQuality = 8
+        # ch:需要保存的图像类型 | en:Image format to save
+        stSaveParam.enImageType = MV_Image_Bmp
         stSaveParam.pcImagePath = ctypes.create_string_buffer(c_file_path)
-        stSaveParam.iMethodValue = 2
+        stSaveParam.iMethodValue = 1
         ret = self.obj_cam.MV_CC_SaveImageToFileEx(stSaveParam)
 
         self.buf_lock.release()
 
         return ret
-

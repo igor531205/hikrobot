@@ -34,6 +34,10 @@ def ToHexStr(num):
 
 
 if __name__ == "__main__":
+
+    # ch:初始化SDK | en: initialize SDK
+    MvCamera.MV_CC_Initialize()
+
     global deviceList
     deviceList = MV_CC_DEVICE_INFO_LIST()
     global cam
@@ -70,8 +74,9 @@ if __name__ == "__main__":
         global obj_cam_operation
 
         deviceList = MV_CC_DEVICE_INFO_LIST()
-        ret = MvCamera.MV_CC_EnumDevices(
-            MV_GIGE_DEVICE | MV_USB_DEVICE, deviceList)
+        n_layer_type = (MV_GIGE_DEVICE | MV_USB_DEVICE | MV_GENTL_CAMERALINK_DEVICE
+                        | MV_GENTL_CXP_DEVICE | MV_GENTL_XOF_DEVICE)
+        ret = MvCamera.MV_CC_EnumDevices(n_layer_type, deviceList)
         if ret != 0:
             strError = "Enum devices fail! ret = :" + ToHexStr(ret)
             QMessageBox.warning(mainWindow, "Error", strError, QMessageBox.Ok)
@@ -87,7 +92,7 @@ if __name__ == "__main__":
         for i in range(0, deviceList.nDeviceNum):
             mvcc_dev_info = cast(deviceList.pDeviceInfo[i], POINTER(
                 MV_CC_DEVICE_INFO)).contents
-            if mvcc_dev_info.nTLayerType == MV_GIGE_DEVICE:
+            if mvcc_dev_info.nTLayerType == MV_GIGE_DEVICE or mvcc_dev_info.nTLayerType == MV_GENTL_GIGE_DEVICE:
                 print("\ngige device: [%d]" % i)
                 user_defined_name = decoding_char(
                     mvcc_dev_info.SpecialInfo.stGigEInfo.chUserDefinedName)
@@ -123,6 +128,57 @@ if __name__ == "__main__":
                     strSerialNumber = strSerialNumber + chr(per)
                 print("user serial number: " + strSerialNumber)
                 devList.append("[" + str(i) + "]USB: " + user_defined_name + " " + model_name
+                               + "(" + str(strSerialNumber) + ")")
+            elif mvcc_dev_info.nTLayerType == MV_GENTL_CAMERALINK_DEVICE:
+                print("\nCML device: [%d]" % i)
+                user_defined_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stCMLInfo.chUserDefinedName)
+                model_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stCMLInfo.chModelName)
+                print("device user define name: " + user_defined_name)
+                print("device model name: " + model_name)
+
+                strSerialNumber = ""
+                for per in mvcc_dev_info.SpecialInfo.stCMLInfo.chSerialNumber:
+                    if per == 0:
+                        break
+                    strSerialNumber = strSerialNumber + chr(per)
+                print("user serial number: " + strSerialNumber)
+                devList.append("[" + str(i) + "]CML: " + user_defined_name + " " + model_name
+                               + "(" + str(strSerialNumber) + ")")
+            elif mvcc_dev_info.nTLayerType == MV_GENTL_CXP_DEVICE:
+                print("\nCXP device: [%d]" % i)
+                user_defined_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stCXPInfo.chUserDefinedName)
+                model_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stCXPInfo.chModelName)
+                print("device user define name: " + user_defined_name)
+                print("device model name: " + model_name)
+
+                strSerialNumber = ""
+                for per in mvcc_dev_info.SpecialInfo.stCXPInfo.chSerialNumber:
+                    if per == 0:
+                        break
+                    strSerialNumber = strSerialNumber + chr(per)
+                print("user serial number: " + strSerialNumber)
+                devList.append("[" + str(i) + "]CXP: " + user_defined_name + " " + model_name
+                               + "(" + str(strSerialNumber) + ")")
+            elif mvcc_dev_info.nTLayerType == MV_GENTL_XOF_DEVICE:
+                print("\nXoF device: [%d]" % i)
+                user_defined_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stXoFInfo.chUserDefinedName)
+                model_name = decoding_char(
+                    mvcc_dev_info.SpecialInfo.stXoFInfo.chModelName)
+                print("device user define name: " + user_defined_name)
+                print("device model name: " + model_name)
+
+                strSerialNumber = ""
+                for per in mvcc_dev_info.SpecialInfo.stXoFInfo.chSerialNumber:
+                    if per == 0:
+                        break
+                    strSerialNumber = strSerialNumber + chr(per)
+                print("user serial number: " + strSerialNumber)
+                devList.append("[" + str(i) + "]XoF: " + user_defined_name + " " + model_name
                                + "(" + str(strSerialNumber) + ")")
 
         ui.ComboDevices.clear()
@@ -201,8 +257,6 @@ if __name__ == "__main__":
 
     # ch:设置触发模式 | en:set trigger mode
     def set_continue_mode():
-        strError = None
-
         ret = obj_cam_operation.Set_trigger_mode(False)
         if ret != 0:
             strError = "Set continue mode failed ret:" + \
@@ -215,7 +269,6 @@ if __name__ == "__main__":
 
     # ch:设置软触发模式 | en:set software trigger mode
     def set_software_trigger_mode():
-
         ret = obj_cam_operation.Set_trigger_mode(True)
         if ret != 0:
             strError = "Set trigger mode failed ret:" + ToHexStr(ret)
@@ -248,8 +301,23 @@ if __name__ == "__main__":
         except ValueError:
             return False
 
-    # ch: 获取参数 | en:get param
+    # en:save image
+    def save_jpg():
+        ret = obj_cam_operation.Save_jpg()
+        if ret != MV_OK:
+            strError = "Save jpg failed ret:" + ToHexStr(ret)
+            QMessageBox.warning(mainWindow, "Error", strError, QMessageBox.Ok)
+        else:
+            print("Save image success")
 
+    def is_float(str):
+        try:
+            float(str)
+            return True
+        except ValueError:
+            return False
+
+    # ch: 获取参数 | en:get param
     def get_param():
         ret = obj_cam_operation.Get_parameter()
         if ret != MV_OK:
@@ -324,5 +392,8 @@ if __name__ == "__main__":
     app.exec_()
 
     close_device()
+
+    # ch:反初始化SDK | en: finalize SDK
+    MvCamera.MV_CC_Finalize()
 
     sys.exit()

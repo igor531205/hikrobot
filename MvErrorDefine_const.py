@@ -39,6 +39,7 @@ MV_E_ACCESS_DENIED                           = 0x80000203  # < \~chinese 设备�
 MV_E_BUSY                                    = 0x80000204  # < \~chinese 设备忙，或网络断开       \~english Device is busy, or network disconnected
 MV_E_PACKET                                  = 0x80000205  # < \~chinese 网络包数据错误           \~english Network data packet error
 MV_E_NETER                                   = 0x80000206  # < \~chinese 网络相关错误             \~english Network error
+MV_E_KEY_VERIFICATION                        = 0x8000020F  # < \~chinese 秘钥校验错误              \~english SwitchKey error
 MV_E_IP_CONFLICT                             = 0x80000221  # < \~chinese 设备IP冲突               \~english Device IP conflict
 
 # USB_STATUS对应的错误码:范围0x80000300-0x800003FF
